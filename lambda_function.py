@@ -243,13 +243,23 @@ class IntentReflectorHandler(AbstractRequestHandler):
             speak_output+="candidat"
             speak_output+="<say-as interpret-as=\"characters\">.</say-as>"
             speak_output+="france travail"
-            speak_output+="<say-as interpret-as=\"characters\">.fr/</say-as>"
+            speak_output+="<say-as interpret-as=\"characters\">.fr</say-as>"
+            speak_output+=", <say-as interpret-as=\"characters\">/</say-as>"
+
             speak_output+=", offres, "
-            speak_output+="<say-as interpret-as=\"characters\">offres/</say-as>"
-            speak_output+="recherche, "
-            speak_output+="<say-as interpret-as=\"characters\">recherche/</say-as>"
-            speak_output+="détail, "
-            speak_output+="<say-as interpret-as=\"characters\">detail/" + myoffer["content"]["id"] + "</say-as>"
+            speak_output+=", <say-as interpret-as=\"characters\">offres</say-as>"
+                
+            speak_output+=", <say-as interpret-as=\"characters\">/</say-as>"
+
+            speak_output+=", recherche, "
+            speak_output+="<say-as interpret-as=\"characters\">recherche</say-as>"
+            speak_output+=", <say-as interpret-as=\"characters\">/</say-as>"
+
+            speak_output+=", détail, "
+            speak_output+="<say-as interpret-as=\"characters\">detail</say-as>"
+            speak_output+=", <say-as interpret-as=\"characters\">/</say-as>"
+
+            speak_output += ", <say-as interpret-as=\"characters\">" + myoffer["content"]["id"] + "</say-as>"
 
         elif intent_name == "JobSearch":
             speak_output = "ok. voilà les résultats de la recherche d'emploi de " + jobname + " à " + city + " dans un rayon de " + str(rayon) + " km , c'est bien ça ?"
