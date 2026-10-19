@@ -1,0 +1,299 @@
+# -*- coding: utf-8 -*-
+
+# This sample demonstrates handling intents from an Alexa skill using the Alexa Skills Kit SDK for Python.
+# Please visit https://alexa.design/cookbook for additional examples on implementing slots, dialog management,
+# session persistence, api calls, and more.
+# This sample is built using the handler classes approach in skill builder.
+import logging
+import ask_sdk_core.utils as ask_utils
+
+from ask_sdk_core.skill_builder import SkillBuilder
+from ask_sdk_core.dispatch_components import AbstractRequestHandler
+from ask_sdk_core.dispatch_components import AbstractExceptionHandler
+from ask_sdk_core.handler_input import HandlerInput
+
+from ask_sdk_model import Response
+import requests
+import json
+listeoffres={}
+def getDescriptionFromAPI(numero, myoffer):
+    a=""
+    try:
+        response = requests.get('https://candidat.francetravail.fr/offres/recherche/detail/' + myoffer["content"]["id"])
+        print(response.status_code) # 200
+        print(response.text)
+        a+= "voilà la description complète pour   " + myoffer["content"]["title"] + " : "
+        zz = response.text.split("<p data-cy=\"descriptif\" class=\"mb-3\">")
+        
+        d=0
+        f=1
+        paspremier=False
+        descriptif=""
+        for z in zz:
+
+            print("hey")
+            d+=1
+            if paspremier:
+                k=z.index("</p>")
+                print("YYYEEESSS")
+                abc=z[:(k + 1)]
+
+                print("descriptif:")
+                print(abc)
+                descriptif += abc
+                
+                f+=1
+            paspremier=True
+        a+=descriptif
+        a=a.replace("H/F", "femme ou homme")
+        a+=". tu peux me demander pour toutes les autres offres."
+    except Exception as e:
+        a = "Error occurred in get description handler : "+str(e) + "."
+    print(a)
+    return a
+    
+
+
+def getReponseFromAPI(postalcode, jobname, rayon):
+    a=""
+    try:
+        response = requests.get('https://candidat.francetravail.fr/offres/recherche?lieux=' + postalcode + '&motsCles=' + jobname.replace(" ", "+") + '&offresPartenaires=true&rayon=' + rayon)
+        print(response.status_code) # 200
+        print(response.text)
+        zz=response.text.split("{\"coordonnees\":{")
+        if len(zz) > 1:
+            a+= "Dans les 10 résultats, J'ai trouvé des offres de :  "
+        else:
+            a+="aucun résultat ne correspond à la recherche"
+        
+        
+        d=0
+        f=1
+        paspremier=False
+        for z in zz:
+
+            print("hey")
+            d+=1
+            if paspremier:
+                 #print(z)
+                if d > 11:
+                    break
+                if "}]" in z:
+                    k=z.index("}]")
+                    print("YYYEEESSS")
+                    abc="{\"coordonnees\":{"+z[:(k + 1)]
+
+                else:
+                    abc="{\"coordonnees\":{"+z[:(len(z) - 1)]
+                print("json:")
+                print(abc)
+                offre=json.loads(abc)
+                listeoffres[str(f)] = offre
+                f+=1
+                a+=  offre["content"]["title"] + ", "
+            paspremier=True
+        a=a.replace("H/F", "femme ou homme")
+        a+=". "
+        #a += list(list(response.text.split("zoneAfficherListeOffres"))[1].split("h1"))[0] # JSON response content
+    except Exception as e:
+        a = "Error occurred: "+str(e) + "."
+    print(a)
+    return a
+    
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+
+class LaunchRequestHandler(AbstractRequestHandler):
+    """Handler for Skill Launch."""
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+
+        return ask_utils.is_request_type("LaunchRequest")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "Bienvenue dans ma recherche d'emploi vocale. Dis moi le métier, la ville ou le lieu, ou le rayon de ta recherche pour pouvoir t'aider."
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .ask(speak_output)
+                .response
+        )
+
+
+class HelloWorldIntentHandler(AbstractRequestHandler):
+    """Handler for Hello World Intent."""
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("HelloWorldIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "Hello World!"
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                # .ask("add a reprompt if you want to keep the session open for the user to respond")
+                .response
+        )
+
+
+class HelpIntentHandler(AbstractRequestHandler):
+    """Handler for Help Intent."""
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("AMAZON.HelpIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "You can say hello to me! How can I help?"
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .ask(speak_output)
+                .response
+        )
+
+
+class CancelOrStopIntentHandler(AbstractRequestHandler):
+    """Single handler for Cancel and Stop Intent."""
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return (ask_utils.is_intent_name("AMAZON.CancelIntent")(handler_input) or
+                ask_utils.is_intent_name("AMAZON.StopIntent")(handler_input))
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "Goodbye!"
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .response
+        )
+
+
+class SessionEndedRequestHandler(AbstractRequestHandler):
+    """Handler for Session End."""
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_request_type("SessionEndedRequest")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+
+        # Any cleanup logic goes here.
+
+        return handler_input.response_builder.response
+
+
+class IntentReflectorHandler(AbstractRequestHandler):
+    """The intent reflector is used for interaction model testing and debugging.
+    It will simply repeat the intent the user said. You can create custom handlers
+    for your intents by defining them above, then also adding them to the request
+    handler chain below.
+    """
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_request_type("IntentRequest")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        intent_name = ask_utils.get_intent_name(handler_input)
+        slots = handler_input.request_envelope.request.intent.slots
+        try:
+            jobname = slots['jobname'].value
+            city = slots["maville"].value
+            rayon = slots["monrayon"].value
+        except:
+            print("ce n'est pas cet intent")
+        try: 
+            numerooffre=slots["numerooffre"].value
+        except:
+            print("ce n'est pas cet intent")
+
+        if intent_name == "JobOfferDetails":
+            step="étape "
+            try:
+                step += "1, "
+                myoffer = listeoffres[numerooffre]
+                step += "2, "
+                address=myoffer["content"]["address"]
+                step += "3, "
+                company=myoffer["content"]["subtitle"]
+                step += "4, "
+    
+                myaddress=address.index("<a") - 1
+                step +="5, "
+                #speak_output = "tu voudrais avoir plus d'information sur l'offre numero  "+str(numerooffre) + " c'est bien ça ?"
+                speak_output = "l'offre de " + myoffer["content"]["title"] + " a été " + myoffer["content"]["subdescription"] + " par " + company + " et est basée à " + address[:myaddress]
+                speak_output += ". si tu veux, tu peux me demander l'ID de l'offre pour consulter toi-même la description complète."
+            except Exception as e:
+                speak_output = "erreur s'est produire : "+str(e)+ step
+        elif intent_name == "JobOfferId":
+            myoffer = listeoffres[numerooffre]
+            speak_output = "pour la consulter toi-même, l'ID de l'offre " +myoffer["content"]["title"]+" est "+myoffer["content"]["id"]
+        elif intent_name == "JobSearch":
+            speak_output = "ok. voilà les résultats de la recherche d'emploi de " + jobname + " à " + city + " dans un rayon de " + str(rayon) + " km , c'est bien ça ?"
+            try:
+                postalcode={"toulon": "83137", "cayenne": "97302"}[city.lower()]
+                speak_output += getReponseFromAPI(postalcode, jobname, str(rayon))
+                speak_output += ". pour avoir plus d'informations sur chaque offre d'emploi, demande moi plus de détails sur la premiere , deuxieme, troisieme offre, etc. jusqu'à la dixième." 
+            except Exception as e:
+                speak_output += " une erreur s'est produite : " + str(e)
+        else:
+            speak_output = "You just triggered " + intent_name + "."
+        
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                 .ask("tu peux me redemander si tu veux trouver d'autres offres d'emploi pour un autre métier")
+                .response
+        )
+
+
+class CatchAllExceptionHandler(AbstractExceptionHandler):
+    """Generic error handling to capture any syntax or routing errors. If you receive an error
+    stating the request handler chain is not found, you have not implemented a handler for
+    the intent being invoked or included it in the skill builder below.
+    """
+    def can_handle(self, handler_input, exception):
+        # type: (HandlerInput, Exception) -> bool
+        return True
+
+    def handle(self, handler_input, exception):
+        # type: (HandlerInput, Exception) -> Response
+        logger.error(exception, exc_info=True)
+
+        speak_output = "Désolé , j'ai un peu de mal à faire ce que vous me demandez, réessayer s'il vous plait."
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .ask(speak_output)
+                .response
+        )
+
+# The SkillBuilder object acts as the entry point for your skill, routing all request and response
+# payloads to the handlers above. Make sure any new handlers or interceptors you've
+# defined are included below. The order matters - they're processed top to bottom.
+
+
+sb = SkillBuilder()
+
+sb.add_request_handler(LaunchRequestHandler())
+sb.add_request_handler(HelloWorldIntentHandler())
+sb.add_request_handler(HelpIntentHandler())
+sb.add_request_handler(CancelOrStopIntentHandler())
+sb.add_request_handler(SessionEndedRequestHandler())
+sb.add_request_handler(IntentReflectorHandler()) # make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
+
+sb.add_exception_handler(CatchAllExceptionHandler())
+
+lambda_handler = sb.lambda_handler()

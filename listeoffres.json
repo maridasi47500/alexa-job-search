@@ -1,0 +1,299 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "je cherche mon prochain emploi",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "HelloWorldIntent",
+                    "slots": [],
+                    "samples": [
+                        "bonjour",
+                        "coucou",
+                        "salut",
+                        "me dire bonjour"
+                    ]
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "JobSearch",
+                    "slots": [
+                        {
+                            "name": "jobname",
+                            "type": "JobName",
+                            "samples": [
+                                "{jobname}",
+                                "un emploi de {jobname}",
+                                "je recherche un emploi de {jobname}"
+                            ]
+                        },
+                        {
+                            "name": "maville",
+                            "type": "AMAZON.City",
+                            "samples": [
+                                "je cherche un emploi dans {maville}",
+                                "dans {maville}",
+                                "à {maville}",
+                                "je cherche un emploi à {maville}"
+                            ]
+                        },
+                        {
+                            "name": "monrayon",
+                            "type": "AMAZON.NUMBER",
+                            "samples": [
+                                "je cherche un emploi à {maville} dans un rayon de {monrayon} km",
+                                "je cherche un emploi dans un rayon de {monrayon} km",
+                                "dans un rayon de {monrayon} km"
+                            ]
+                        }
+                    ],
+                    "samples": [
+                        "je cherche un emploi dans un rayon de {monrayon} km",
+			"je cherche un emploi de {jobname} à {maville} dans un rayon de {monrayon} km",
+                        "je cherche un emploi de {jobname} à {maville}",
+                        "je cherche un emploi dans un rayon de {monrayon}",
+                        "je cherche un emploi dans {maville}",
+                        "je cherche un emploi à {maville}",
+                        "je cherche un emploi de {jobname}"
+                    ]
+                },
+                {
+                    "name": "JobOfferDetails",
+                    "slots": [
+                        {
+                            "name": "numerooffre",
+                            "type": "AMAZON.Ordinal"
+                        }
+                    ],
+                    "samples": [
+                                "donne moi plus d'information sur la {numerooffre}",
+                                "je veux plus de détail sur la {numerooffre}",
+				"dis moi tout sur la {numerooffre} offre",
+				"je voudrais savoir ce que c'est la {numerooffre} offre",
+                                "parle moi de la {numerooffre}"
+                    ]
+                },
+                {
+                    "name": "JobOfferId",
+                    "slots": [
+                        {
+                            "name": "numerooffre",
+                            "type": "AMAZON.Ordinal"
+                        }
+                    ],
+                    "samples": [
+                                "donne moi l'identifiant de la {numerooffre} offre",
+                                "je veux l'i.d. de de la {numerooffre} offre",
+				"dis moi l'identifiant de la {numerooffre} offre",
+				"je voudrais avoir  l'identifiant de ce que c'est la {numerooffre} offre",
+				"je veux la l'identifiant de la {numerooffre} offre",  
+                                "quelle est l'i.d. de la {numerooffre} offre"
+                    ]
+                }
+            ],
+            "types": [
+                {
+                    "name": "JobName",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "technicien support informatique"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "technicienne système et réseaux"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "développeuse web"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "développeur web"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "technicienne informatique"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "dialog": {
+            "intents": [
+                {
+                    "name": "JobSearch",
+                    "confirmationRequired": true,
+                    "prompts": {
+                        "confirmation": "Confirm.Intent.502989650849"
+                    },
+                    "slots": [
+                        {
+                            "name": "jobname",
+                            "type": "JobName",
+                            "confirmationRequired": true,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "confirmation": "Confirm.Slot.502989650849.1432911434965",
+                                "elicitation": "Elicit.Slot.502989650849.1432911434965"
+                            }
+                        },
+                        {
+                            "name": "maville",
+                            "type": "AMAZON.City",
+                            "confirmationRequired": true,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "confirmation": "Confirm.Slot.502989650849.703154561900",
+                                "elicitation": "Elicit.Slot.502989650849.703154561900"
+                            }
+                        },
+                        {
+                            "name": "monrayon",
+                            "type": "AMAZON.NUMBER",
+                            "confirmationRequired": true,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "confirmation": "Confirm.Slot.502989650849.869739169355",
+                                "elicitation": "Elicit.Slot.502989650849.869739169355"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "delegationStrategy": "ALWAYS"
+        },
+        "prompts": [
+            {
+                "id": "Confirm.Intent.502989650849",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "ok, je vais pouvoir te donner les résultats de ta recherche, tu cherches un emploi de {jobname} à {maville} dans un rayon de {monrayon}  km, dis oui pour confirmer?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.502989650849.869739169355",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "dans un rayon de combien de km cherches tu un emploi de {jobname} à {maville} ?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "dans un rayon de combien de km cherches tu un emploi à {maville} ?"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Slot.502989650849.869739169355",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "ok. tu cherches un emploi dans un rayon de {monrayon} km, c'est bien ça ?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.502989650849.703154561900",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "maintenant, dis moi le nom de la ville où tu cherches un emploi"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "maintenant, dis moi le nom de la ville où tu cherches un emploi de {jobname}"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "cool, et  dans quel ville tu cherches un emploi ?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "génial, tu cherches un emploi de {jobname} dans quelle ville ?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "super , dans quelle ville cherches tu un emploi ?"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Slot.502989650849.703154561900",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "tu cherches un emploi  à {maville} , si j'ai bien compris ?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "ok, tu cherches un emploi à {maville}"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.502989650849.1432911434965",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "un emploi de quoi cherches tu ?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "quel genre de job recherches tu dans la région , quel est le titre de l'offre d'emploi ?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "quel emploi recherches tu à {maville} , peux tu me dire le nom du métier ?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "peux tu me dire quel emploi tu recherches "
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Slot.502989650849.1432911434965",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "ok, tu cherches bien un emploi de {jobname} à {maville} ?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "ok, tu es bien sûr que tu cherches un emploi de {jobname}"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "tu cherches bien un emploi de {jobname}"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "tu cherches un emploi de {jobname} , c'est ça ?"
+                    }
+                ]
+            }
+        ]
+    }
+}
