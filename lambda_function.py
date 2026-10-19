@@ -231,13 +231,26 @@ class IntentReflectorHandler(AbstractRequestHandler):
                 myaddress=address.index("<a") - 1
                 step +="5, "
                 #speak_output = "tu voudrais avoir plus d'information sur l'offre numero  "+str(numerooffre) + " c'est bien ça ?"
-                speak_output = "l'offre de " + myoffer["content"]["title"] + " a été " + myoffer["content"]["subdescription"] + " par " + company + " et est basée à " + address[:myaddress]
+                speak_output = "l'offre de " + myoffer["content"]["title"] + " a été " + myoffer["content"]["subdescription"] + (" par " if len(company) > 0 else " ") + company + " et est basée à " + address[:myaddress]
                 speak_output += ". si tu veux, tu peux me demander l'ID de l'offre pour consulter toi-même la description complète."
             except Exception as e:
-                speak_output = "erreur s'est produire : "+str(e)+ step
+                speak_output = "erreur s'est produire : "+str(e).replace("\"", "").replace("'","")+ step
         elif intent_name == "JobOfferId":
             myoffer = listeoffres[numerooffre]
             speak_output = "pour la consulter toi-même, l'ID de l'offre " +myoffer["content"]["title"]+" est "+myoffer["content"]["id"]
+            speak_output+=". pour pouvoir lire l'offre d'emploi, entre l'adresse : "
+            speak_output+=" <say-as interpret-as=\"characters\">https://</say-as>"
+            speak_output+="candidat"
+            speak_output+="<say-as interpret-as=\"characters\">.</say-as>"
+            speak_output+="france travail"
+            speak_output+="<say-as interpret-as=\"characters\">.fr/</say-as>"
+            speak_output+=", offres, "
+            speak_output+="<say-as interpret-as=\"characters\">offres/</say-as>"
+            speak_output+="recherche, "
+            speak_output+="<say-as interpret-as=\"characters\">recherche/</say-as>"
+            speak_output+="détail, "
+            speak_output+="<say-as interpret-as=\"characters\">detail/" + myoffer["content"]["id"] + "</say-as>"
+
         elif intent_name == "JobSearch":
             speak_output = "ok. voilà les résultats de la recherche d'emploi de " + jobname + " à " + city + " dans un rayon de " + str(rayon) + " km , c'est bien ça ?"
             try:
